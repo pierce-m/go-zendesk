@@ -167,7 +167,7 @@ func (z *Client) RedactTicketComment(
 	ticketCommentID int64,
 	body RedactTicketCommentRequest,
 ) error {
-	path := fmt.Sprintf("/api/v2/comment_redactions/%d.json", ticketCommentID)
+	path := fmt.Sprintf("/comment_redactions/%d.json", ticketCommentID)
 	_, err := z.put(ctx, path, body)
 	return err
 }
