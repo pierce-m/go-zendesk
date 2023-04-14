@@ -12,6 +12,7 @@ type TicketCommentAPI interface {
 	CreateTicketComment(ctx context.Context, ticketID int64, ticketComment TicketComment) (TicketComment, error)
 	ListTicketComments(ctx context.Context, ticketID int64, opts *ListTicketCommentsOptions) (*ListTicketCommentsResult, error)
 	MakeCommentPrivate(ctx context.Context, ticketID int64, ticketCommentID int64) error
+	RedactTicketComment(ctx context.Context, ticketCommentID int64, body RedactTicketCommentRequest) (*TicketComment, error)
 }
 
 // TicketComment is a struct for ticket comment payload
@@ -166,8 +167,20 @@ func (z *Client) RedactTicketComment(
 	ctx context.Context,
 	ticketCommentID int64,
 	body RedactTicketCommentRequest,
-) error {
+) (*TicketComment, error) {
+	var redacted struct {
+		Comment TicketComment `json:"comment"`
+	}
+
 	path := fmt.Sprintf("/comment_redactions/%d.json", ticketCommentID)
-	_, err := z.put(ctx, path, body)
-	return err
+	resp, err := z.put(ctx, path, body)
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.Unmarshal(resp, &redacted)
+	if err != nil {
+		return nil, err
+	}
+	return &redacted.Comment, nil
 }
