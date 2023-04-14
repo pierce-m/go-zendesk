@@ -174,6 +174,9 @@ func (z *Client) RedactTicketComment(
 
 	path := fmt.Sprintf("/comment_redactions/%d.json", ticketCommentID)
 	resp, err := z.put(ctx, path, body)
+	if err != nil {
+		return nil, err
+	}
 
 	err = json.Unmarshal(resp, &redacted)
 	if err != nil {
